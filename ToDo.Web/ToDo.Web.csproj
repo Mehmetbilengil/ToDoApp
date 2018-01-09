@@ -210,6 +210,10 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\img\bootstrap-formhelpers-countries.flags-LICENSE.txt" />
+    <Content Include="Content\img\bootstrap-formhelpers-countries.flags.png" />
+    <Content Include="Content\img\bootstrap-formhelpers-currencies.flags.png" />
+    <Content Include="Content\img\bootstrap-formhelpers-googlefonts.png" />
     <Content Include="Content\img\loading-image.gif" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />

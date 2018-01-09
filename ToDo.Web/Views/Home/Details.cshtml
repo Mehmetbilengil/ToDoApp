@@ -68,7 +68,7 @@
                             </div>
                             <div class="form-group">
 
-                                <input type="time" name="NotificationTime" data-bind="date:NotificationTime" class="form-control" />
+                                <input type="time" name="NotificationTime" data-bind="value:NotificationTime" class="form-control" />
                             </div>
                         </div>
                     </div>
@@ -111,8 +111,9 @@
                                 <input type="date" data-bind="date:NotificationDate" class="form-control" />
                             </div>
                             <div class="form-group">
+                                <input type="time" name="NotificationTimeAUpdate" data-bind="value:NotificationTime" class="form-control" />
 
-                                <input type="time"  name="NotificationTimeAUpdate"  data-bind="date:NotificationTime" class="form-control" />
+                            
                             </div>
                         </div>
                     </div>
@@ -133,7 +134,25 @@
 @section scripts {
     @Scripts.Render("~/bundles/jqueryval")
     <script type="text/javascript">
+        ko.bindingHandlers.datePicker = {
+            init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+                // Register change callbacks to update the model
+                // if the control changes.       
+                ko.utils.registerEventHandler(element, "change", function () {
+                    var value = valueAccessor();
+                    value(new Date(element.value));
+                });
+            },
+            // Update the control whenever the view model changes
+            update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+                var value = valueAccessor();
+                element.value = value().toISOString();
+            }
+        };
 
+        var viewModel = {
+            MyDate: ko.observable(new Date())
+        };
         function ToDoTask(id, desc, notificationRequested, notificationType, notificationDate, notificationTime) {
             var self = this;
             self.Id = id;
@@ -145,10 +164,12 @@
             self.NotificationTime = ko.observable(notificationTime);
             self.NotificationDateFormatted = ko.pureComputed(function () {
                 if (self.NotificationRequested())
-                    return moment(self.NotificationDate()).format("MM/DD/YYYY") + " " + moment(self.NotificationTime()).format("HH:mm");
+                    return moment(self.NotificationDate()).format("MM/DD/YYYY") + " " + self.NotificationTime();
 
                 return "";
             });
+
+         
         }
 
 
@@ -159,16 +180,20 @@
             self.NotificationTypes =@(Html.Raw(Json.Encode(EnumHelper.GetSelectList(typeof(ToDo.Common.NotificationType)))))
             self.Tasks = ko.observableArray();
 
-            $.getJSON("@Url.Action("GetList", "Task",new { listId=Model.Id})", function (allData) {
-                var mappedTasks = $.map(allData, function (item) {
-                    var date = new Date(item.NotificationDate.match(/\d+/)[0] * 1);
-                    var time = new Date(item.NotificationTime.match(/\d+/)[0] * 1);
-                    return new ToDoTask(item.Id, item.Desc, item.NotificationRequested, item.NotificationType, date, time)
+            self.LoadData = function () {
+                $.getJSON("@Url.Action("GetList", "Task",new { listId=Model.Id})", function (allData) {
+                    var mappedTasks = $.map(allData, function (item) {
+                        var date = new Date(item.NotificationDate.match(/\d+/)[0] * 1);
+                     
+                        return new ToDoTask(item.Id, item.Desc, item.NotificationRequested, item.NotificationType, date, item.NotificationTimeString)
+                    });
+                    self.Tasks(mappedTasks);
                 });
-                self.Tasks(mappedTasks);
-            });
-
-
+            }
+            self.Clone = function (item) {
+                return new ToDoTask(item.Id, item.Desc(), item.NotificationRequested(), item.NotificationType(), item.NotificationDate(), item.NotificationTime());
+            }
+            self.LoadData();
 
 
             self.addTask = function () {
@@ -181,9 +206,9 @@
                     type: "post", contentType: "application/json",
                     success: function (response) {
                         if (response.result) {
-                            self.Tasks.push(new ToDoTask(response.data.Id, self.EditItem().Desc()));
-                            self.EditItem(new ToDoTask(null, null, false, 0, null));
+                         
                             $('#addTaskViewModal').modal('toggle');
+                            self.LoadData();
                         } else {
                             $('#addTaskViewModal').modal('show').find('#savingResultLabel').text(response.message);
                         }
@@ -195,7 +220,7 @@
 
             }
             self.editTask = function (item) {
-                self.EditItem ( item);
+                self.EditItem(self.Clone(item));
                  $('#editTaskViewModal').modal('show');
              }
              self.updateTask =  function () {
@@ -204,8 +229,9 @@
                     type: "post", contentType: "application/json",
                     success: function (response) {
                         if (response.result) {
-                            self.EditItem(new ToDoTask("",""));
+                          
                             $('#editTaskViewModal').modal('toggle');
+                            self.LoadData();
                         } else {
                             $('#editTaskViewModal').modal('show').find('#savingResultLabel').text(response.message);
                         }

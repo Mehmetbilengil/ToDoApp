@@ -44,6 +44,7 @@ namespace ToDo.Web.Controllers
                 var date = model.NotificationDate.Value;
                 var time = model.NotificationTime.Value;
                 model.NotificationDate = new DateTime(date.Year,date.Month,date.Day,time.Hour,time.Minute,0);
+                model.NotificationTime = model.NotificationDate;
                 if (model.NotificationDate.Value<DateTime.Now)
                 {
                     return AJAXResult(false, "Norification date must be in future.");
@@ -51,7 +52,7 @@ namespace ToDo.Web.Controllers
             }
             model.UserId = UserId;
             var result = service.Save(model);
-            return AJAXResult(_result: result.ResultType == ResultType.Success, _message: result.ResultMessage, _data: new { model.Id });
+            return AJAXResult(_result: result.ResultType == ResultType.Success, _message: result.ResultMessage, _data: model);
         }
 
         [HttpPost]
@@ -74,6 +75,7 @@ namespace ToDo.Web.Controllers
                 var date = model.NotificationDate.Value;
                 var time = model.NotificationTime.Value;
                 model.NotificationDate = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, 0);
+                model.NotificationTime = model.NotificationDate;
                 if (model.NotificationDate.Value < DateTime.Now)
                 {
                     return AJAXResult(false, "Norification date must be in future.");
@@ -82,7 +84,7 @@ namespace ToDo.Web.Controllers
             model.UserId = UserId;
             var result = service.Update(model);
 
-            return AJAXResult(_result: result.ResultType == ResultType.Success, _message: result.ResultMessage);
+            return AJAXResult(_result: result.ResultType == ResultType.Success, _message: result.ResultMessage, _data: model);
         }
 
         [HttpPost]

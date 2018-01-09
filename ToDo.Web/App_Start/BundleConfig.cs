@@ -14,8 +14,9 @@ namespace ToDo.Web
                       "~/Scripts/respond.js",
                       "~/Scripts/knockout-{version}.js",
                       "~/Scripts/jquery.blockUI.js",
-                      "~/Scripts/moment.js",
-                      "~/Scripts/knockout-date-bindings.js"
+                      "~/Scripts/moment.js"
+                    ,  "~/Scripts/knockout-date-bindings.js"
+                     //  , "~/Scripts/bootstrap-formhelpers.js"
                         ));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
@@ -31,7 +32,9 @@ namespace ToDo.Web
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
-                      "~/Content/site.css"));
+                      "~/Content/site.css"
+                    // ,"~/Content/cssdate/bootstrap-formhelpers.css"
+                      ));
         }
     }
 }

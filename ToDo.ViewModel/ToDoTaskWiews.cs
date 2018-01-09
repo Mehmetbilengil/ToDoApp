@@ -21,6 +21,11 @@ namespace ToDo.ViewModel
         [DataType(DataType.Time)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:HH:mm}")]
         public DateTime? NotificationTime { get; set; }
+        public string NotificationTimeString
+        {
+            get
+            { return NotificationTime?.ToString("HH:mm"); }
+        }
     }
     public class ToDoTaskEditView
     {
@@ -39,6 +44,8 @@ namespace ToDo.ViewModel
         [DataType(DataType.Time)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:HH:mm}")]
         public DateTime? NotificationTime { get; set; }
+        public string NotificationTimeString { get
+            { return NotificationTime?.ToString("HH:mm"); } }
     }
   
 }
