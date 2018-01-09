@@ -1,0 +1,168 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+
+<div class="row" id="todoListContainer">
+    <div class="col-md-12">
+        <h2>To-Do Lists (<span data-bind="text: ToDoItems().length"></span>)</h2>
+
+        <button data-bind="click: addToDo" class="btn btn-primary"><i class="glyphicon glyphicon-plus-sign"></i> Add</button>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody data-bind="foreach: ToDoItems">
+                <tr>
+                    <td data-bind="text: Title"></td>
+                    
+                    <td class="actionCoumn"><a href="#" title="remove item" data-bind="click: $root.remove"><i class="glyphicon glyphicon-trash"></i> remove</a></td>
+                    <td class="actionCoumn"><a href="#" title="edit item" data-bind="click: $root.edit"><i class="glyphicon glyphicon-edit"></i> edit</a></td>
+                    <td class="actionCoumn"><a data-bind=" attr: {href: '@Url.Action("Details", "Home")/'+ Id}"><i class="glyphicon glyphicon-zoom-in"></i> details</a></td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+    <div id="addToDoViewModal" class="modal fade" data-bind="with: EditItem">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Add new to-do list</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" data-bind="value:Title" />
+                </div>
+                <div class="modal-footer">
+                    <label id="savingResultLabel" class="text-danger"></label>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: $root.saveToDo">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editToDoViewModal" class="modal fade" data-bind="with: EditItem">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">update to-do list</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" data-bind="value:Title" />
+                </div>
+                <div class="modal-footer">
+                    <label id="savingResultLabel" class="text-danger"></label>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: $root.update">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+<script type="text/javascript">
+        function ToDoItem(id ,title) {
+            var self = this;
+            self.Id = id;
+            self.Title = ko.observable(title) ;
+        }
+
+
+        function ToDoListViewModel() {
+            var self = this;
+
+            self.EditItem = ko.observable();
+            self.ToDoItems = ko.observableArray();
+
+            $.getJSON("@Url.Action("GetToDoList", "Home")", function (allData) {
+                var mappedToDoItems = $.map(allData, function (item) { return new ToDoItem(item.Id,item.Title) });
+                self.ToDoItems(mappedToDoItems);
+            });
+
+            //self.addToDo = function () {
+            //    self.ToDoItems.push(new ToDoItem(""));
+            //}
+
+
+            self.addToDo = function () {
+                self.EditItem( new ToDoItem());
+                $('#addToDoViewModal').modal('show');
+            }
+            self.saveToDo = function () {
+                $.ajax("@Url.Action("Add", "Home")", {
+                    data: ko.toJSON(self.EditItem),
+                    type: "post", contentType: "application/json",
+                    success: function (response) {
+                        if (response.result) {
+                            self.ToDoItems.push(new ToDoItem(response.data.Id, self.EditItem().Title()));
+                            self.EditItem(new ToDoItem("",""));
+                            $('#addToDoViewModal').modal('toggle');
+                        } else {
+                            $('#addToDoViewModal').modal('show').find('#savingResultLabel').text(response.message);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+
+            }
+             self.remove = function (item) {
+                var _data = JSON.stringify({ id: item.Id });
+                $.ajax("@Url.Action("Remove", "Home")", {
+                    data: _data,
+                    type: "post", contentType: "application/json",
+                    success: function (response) {
+                        if (response.result) {
+                            self.ToDoItems.remove(item);
+
+                        } else {
+                          alert(response.message);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+            }
+             self.edit = function (item) {
+                 self.EditItem(item);
+                 $('#editToDoViewModal').modal('show');
+             }
+             self.update =  function () {
+                $.ajax("@Url.Action("Update", "Home")", {
+                    data: ko.toJSON(self.EditItem),
+                    type: "post", contentType: "application/json",
+                    success: function (response) {
+                        if (response.result) {                         
+                            self.EditItem(new ToDoItem("",""));
+                            $('#editToDoViewModal').modal('toggle');
+                        } else {
+                            $('#editToDoViewModal').modal('show').find('#savingResultLabel').text(response.message);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+
+            }
+
+        }
+
+        ko.applyBindings(new ToDoListViewModel(), document.getElementById("todoListContainer"));
+</script>
+}

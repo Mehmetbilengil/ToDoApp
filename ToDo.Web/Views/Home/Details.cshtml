@@ -1,0 +1,242 @@
+﻿@model ToDo.ViewModel.ToDoItemDetailView
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>List Details</h2>
+
+<div class="row" id="taskContainer">
+    <h4>  @Html.DisplayFor(model => model.Title)</h4>
+    <hr />
+    <button data-bind="click: addTask" class="btn btn-primary"><i class="glyphicon glyphicon-plus-sign"></i> Add task</button>
+    <table class="table table-striped">
+        <caption>Tasks</caption>
+
+        <thead>
+            <tr>
+                <th>Task description</th>
+
+                <th>Notification requestred</th>
+                <th>Notification date</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody data-bind="foreach: Tasks">
+            <tr>
+                <td data-bind="text: Desc"></td>
+                <td data-bind="text: NotificationRequested"></td>
+                <td data-bind="text: NotificationDateFormatted"></td>
+
+                <td class="actionCoumn"><a href="#" title="remove item" data-bind="click: $root.remove"><i class="glyphicon glyphicon-trash"></i> remove</a></td>
+                <td class="actionCoumn"><a href="#" title="edit item" data-bind="click: $root.editTask"><i class="glyphicon glyphicon-edit"></i> edit</a></td>
+
+            </tr>
+        </tbody>
+
+    </table>
+    <div id="addTaskViewModal" class="modal fade" data-bind="with: EditItem">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Add new task</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <div class="form-group">
+                            <textarea data-bind="value:Desc"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" data-bind="checked:NotificationRequested" /> Send notification
+                            </label>
+                        </div>
+                        <div data-bind="visible:NotificationRequested">
+                            <div class="form-group">
+                                <select data-bind="options:  $root.NotificationTypes,
+                                       optionsText: 'Text',
+                                       optionsValue: 'Value',
+                                       value: NotificationType,
+                                       optionsCaption: 'Choose...'"></select>
+                            </div>
+                            <div class="form-group">
+                                <input type="date" name="NotificationDate" data-bind="date:NotificationDate" />
+                            </div>
+                            <div class="form-group">
+
+                                <input type="time" name="NotificationTime" data-bind="date:NotificationTime" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <label id="savingResultLabel" class="text-danger"></label>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: $root.saveTask">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editTaskViewModal" class="modal fade" data-bind="with: EditItem">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">update Task</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <div class="form-group">
+                            <textarea data-bind="value:Desc"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" data-bind="checked:NotificationRequested" /> Send notification
+                            </label>
+                        </div>
+                        <div data-bind="visible:NotificationRequested">
+                            <div class="form-group">
+                                <select data-bind="options:  $root.NotificationTypes,
+                                       optionsText: 'Text',
+                                       optionsValue: 'Value',
+                                       value: NotificationType,
+                                       optionsCaption: 'Choose...'"></select>
+                            </div>
+                            <div class="form-group">
+                                <input type="date" data-bind="date:NotificationDate" />
+                            </div>
+                            <div class="form-group">
+
+                                <input type="time"  name="NotificationTime"  data-bind="date:NotificationTime" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <label id="savingResultLabel" class="text-danger"></label>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: $root.updateTask">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+
+    @Html.ActionLink("Back to List", "Index")
+</p>
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+
+        function ToDoTask(id, desc, notificationRequested, notificationType, notificationDate, notificationTime) {
+            var self = this;
+            self.Id = id;
+            self.Desc = ko.observable(desc);
+            self.ListId = '@Model.Id';
+            self.NotificationRequested = ko.observable(notificationRequested);
+            self.NotificationType = ko.observable(notificationType);
+            self.NotificationDate = ko.observable(notificationDate);
+            self.NotificationTime = ko.observable(notificationTime);
+            self.NotificationDateFormatted = ko.pureComputed(function () {
+                if (self.NotificationRequested())
+                    return moment(self.NotificationDate()).format("MM/DD/YYYY") + " " + moment(self.NotificationTime()).format("HH:mm");
+
+                return "";
+            });
+        }
+
+
+        function ToDoTaskViewModel() {
+            var self = this;
+
+            self.EditItem = ko.observable();
+            self.NotificationTypes =@(Html.Raw(Json.Encode(EnumHelper.GetSelectList(typeof(ToDo.Common.NotificationType)))))
+            self.Tasks = ko.observableArray();
+
+            $.getJSON("@Url.Action("GetList", "Task",new { listId=Model.Id})", function (allData) {
+                var mappedTasks = $.map(allData, function (item) {
+                    var date = new Date(item.NotificationDate.match(/\d+/)[0] * 1);
+                    var time = new Date(item.NotificationTime.match(/\d+/)[0] * 1);
+                    return new ToDoTask(item.Id, item.Desc, item.NotificationRequested, item.NotificationType, date, time)
+                });
+                self.Tasks(mappedTasks);
+            });
+
+
+
+
+            self.addTask = function () {
+                self.EditItem(new ToDoTask(null, null, false, 0, new Date(), new Date()));
+                $('#addTaskViewModal').modal('show');
+            }
+            self.saveTask = function () {
+                $.ajax("@Url.Action("Add", "Task")", {
+                    data: ko.toJSON(self.EditItem),
+                    type: "post", contentType: "application/json",
+                    success: function (response) {
+                        if (response.result) {
+                            self.Tasks.push(new ToDoTask(response.data.Id, self.EditItem().Desc()));
+                            self.EditItem(new ToDoTask(null, null, false, 0, null));
+                            $('#addTaskViewModal').modal('toggle');
+                        } else {
+                            $('#addTaskViewModal').modal('show').find('#savingResultLabel').text(response.message);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+
+            }
+            self.editTask = function (item) {
+                self.EditItem ( item);
+                 $('#editTaskViewModal').modal('show');
+             }
+             self.updateTask =  function () {
+                $.ajax("@Url.Action("Update", "Task")", {
+                    data: ko.toJSON(self.EditItem),
+                    type: "post", contentType: "application/json",
+                    success: function (response) {
+                        if (response.result) {
+                            self.EditItem(new ToDoTask("",""));
+                            $('#editTaskViewModal').modal('toggle');
+                        } else {
+                            $('#editTaskViewModal').modal('show').find('#savingResultLabel').text(response.message);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+
+            }
+             self.remove = function (item) {
+                var _data = JSON.stringify({ id: item.Id });
+                $.ajax("@Url.Action("Remove", "Task")", {
+                    data: _data,
+                    type: "post", contentType: "application/json",
+                    success: function (response) {
+                        if (response.result) {
+                            self.Tasks.remove(item);
+
+                        } else {
+                          alert(response.message);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+            }
+
+        }
+
+        ko.applyBindings(new ToDoTaskViewModel(), document.getElementById("taskContainer"));
+    </script>
+}
