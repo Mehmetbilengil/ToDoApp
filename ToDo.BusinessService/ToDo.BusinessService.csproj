@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="Implementations\ErrorLogService.cs" />
     <Compile Include="Implementations\EmailNotificationSender.cs" />
-    <Compile Include="Implementations\INotificationSender.cs" />
+    <Compile Include="Interface\INotificationSender.cs" />
     <Compile Include="Interface\ITaskService.cs" />
     <Compile Include="Interface\IToDoListService.cs" />
     <Compile Include="Interface\IUserAccountService.cs" />
