@@ -48,27 +48,27 @@
                 <div class="modal-body">
                     <div class="">
                         <div class="form-group">
-                            <textarea data-bind="value:Desc"></textarea>
+                            <textarea data-bind="value:Desc" class="form-control" ></textarea>
                         </div>
                         <div class="form-group">
                             <label>
-                                <input type="checkbox" data-bind="checked:NotificationRequested" /> Send notification
+                                <input  type="checkbox" data-bind="checked:NotificationRequested" /> Send notification
                             </label>
                         </div>
                         <div data-bind="visible:NotificationRequested">
                             <div class="form-group">
-                                <select data-bind="options:  $root.NotificationTypes,
+                                <select class="form-control"  data-bind="options:  $root.NotificationTypes,
                                        optionsText: 'Text',
                                        optionsValue: 'Value',
                                        value: NotificationType,
                                        optionsCaption: 'Choose...'"></select>
                             </div>
                             <div class="form-group">
-                                <input type="date" name="NotificationDate" data-bind="date:NotificationDate" />
+                                <input type="date" name="NotificationDate" data-bind="date:NotificationDate" class="form-control" />
                             </div>
                             <div class="form-group">
 
-                                <input type="time" name="NotificationTime" data-bind="date:NotificationTime" />
+                                <input type="time" name="NotificationTime" data-bind="date:NotificationTime" class="form-control" />
                             </div>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
                 <div class="modal-body">
                     <div class="">
                         <div class="form-group">
-                            <textarea data-bind="value:Desc"></textarea>
+                            <textarea data-bind="value:Desc" class="form-control" ></textarea>
                         </div>
                         <div class="form-group">
                             <label>
@@ -108,11 +108,11 @@
                                        optionsCaption: 'Choose...'"></select>
                             </div>
                             <div class="form-group">
-                                <input type="date" data-bind="date:NotificationDate" />
+                                <input type="date" data-bind="date:NotificationDate" class="form-control" />
                             </div>
                             <div class="form-group">
 
-                                <input type="time"  name="NotificationTime"  data-bind="date:NotificationTime" />
+                                <input type="time"  name="NotificationTimeAUpdate"  data-bind="date:NotificationTime" class="form-control" />
                             </div>
                         </div>
                     </div>

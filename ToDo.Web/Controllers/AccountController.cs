@@ -42,10 +42,7 @@ namespace ToDo.Web.Controllers
                 var result = accountService.Create(model);
                 if (result.ResultType == ResultType.Success)
                 {
-                    //authHepler.Login();
-                    //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Login");
                 }
                 ViewBag.Result = result.ResultMessage;
             }
