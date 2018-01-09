@@ -48,18 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IGenericRepository.cs" />
-    <Compile Include="Migrations\201801090848119_initiald.cs" />
-    <Compile Include="Migrations\201801090848119_initiald.Designer.cs">
-      <DependentUpon>201801090848119_initiald.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801090924545_initialdbb.cs" />
-    <Compile Include="Migrations\201801090924545_initialdbb.Designer.cs">
-      <DependentUpon>201801090924545_initialdbb.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801091238364_initialdbbhh.cs" />
-    <Compile Include="Migrations\201801091238364_initialdbbhh.Designer.cs">
-      <DependentUpon>201801091238364_initialdbbhh.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ToDoContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,17 +66,6 @@
       <Project>{aac98773-15af-4382-9a2d-ff28d4863b46}</Project>
       <Name>ToDo.DomainModel</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201801090848119_initiald.resx">
-      <DependentUpon>201801090848119_initiald.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801090924545_initialdbb.resx">
-      <DependentUpon>201801090924545_initialdbb.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801091238364_initialdbbhh.resx">
-      <DependentUpon>201801091238364_initialdbbhh.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
