@@ -16,7 +16,7 @@ namespace ToDo.BusinessService.Implementations
         {
             using (var repo = new ToDoRepository<ToDoTask>())
             {
-                var list = repo.Query(o => o.NotificationRequested
+                var list = repo.Query(o => o.NotificationRequested && o.NotificationSent==false
                                     && o.NotificationType == NotificationType.Email
                                     && o.NotificationDate <= DateTime.Now
                 ).Select(o => new EmailNotficationData
